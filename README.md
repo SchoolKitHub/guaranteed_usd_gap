@@ -188,6 +188,4 @@ This POC is for **educational and responsible disclosure purposes only**. All te
 
 ---
 
-## License
 
-MIT
