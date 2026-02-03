@@ -1,56 +1,65 @@
-# GMX V1 Vault - Guaranteed USD Accounting Gap (P6)
+# GMX V1 Vault - Guaranteed USD Accounting Gap Vulnerability PoC
 
-[![Foundry](https://img.shields.io/badge/Built%20with-Foundry-FFDB1C.svg)](https://getfoundry.sh/)
-[![Solidity](https://img.shields.io/badge/Solidity-0.6.12-363636.svg)](https://soliditylang.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+This project demonstrates a PoC for the GMX V1 Vault Guaranteed USD accounting gap vulnerability that causes LP fund lockup.
 
-## ⚠️ Critical Vulnerability POC
+## Vulnerability Reference
+- **Bug Bounty Program:** [GMX on Immunefi](https://immunefi.com/bug-bounty/gmx/)
+- **Affected Contract:** Vault.sol (`0x489ee077994B6658eAfA855C308275EAd8097C4A`)
+- **Network:** Arbitrum Mainnet (Chain ID: 42161)
 
-This repository contains a **Proof of Concept** demonstrating a critical accounting vulnerability in the GMX V1 Vault on Arbitrum. The vulnerability causes LP fund lockup due to near-100% pool utilization.
+## Funds at Risk
 
-**Status:** 🔴 ACTIVE ON MAINNET (Block 426581531 and persists to current block)
+The vulnerability was confirmed at block **426581531** and persists to the current block.
+
+```
+WETH Pool State at Block 426581531:
+  poolAmounts:     6,575,202,314,069,967,790 wei (6.575 ETH)
+  reservedAmounts: 6,575,202,304,473,702,214 wei (6.575 ETH)
+  Utilization:     99.99999985%
+  
+Estimated funds at risk: 
+  GMX V1 TVL: ~$1,090,882 USD
+  WETH Locked: 6.575 ETH * $2,500 = $16,438 USD (100% locked)
+  
+At peak V1 TVL (~$1.1B), this vulnerability pattern could lock 100% of LP funds.
+```
 
 ---
 
-## Quick Start
+## Prerequisites
 
-### Prerequisites
+- [Foundry](https://getfoundry.sh/) installed (`curl -L https://foundry.paradigm.xyz | bash && foundryup`)
+- Arbitrum RPC URL (Infura, Alchemy, or public endpoint)
 
-- [Foundry](https://getfoundry.sh/) installed
-- Arbitrum RPC URL (Infura, Alchemy, or public)
+---
 
-### 1. Clone Repository
+## Running the PoC
+
+A prerequisite of running this PoC is setting the `ARBITRUM_RPC_URL` environment variable.
 
 ```bash
+# Clone repository
 git clone https://github.com/SchoolKitHub/guaranteed_usd_gap.git
 cd guaranteed_usd_gap
-```
 
-### 2. Install Dependencies
-
-```bash
+# Install dependencies
 forge install
-```
 
-### 3. Set Environment Variables
+# Set RPC URL
+export ARBITRUM_RPC_URL=https://arbitrum-mainnet.infura.io/v3/[YOUR_API_KEY]
 
-```bash
-export ARBITRUM_RPC_URL="https://arbitrum-mainnet.infura.io/v3/YOUR_KEY"
-```
-
-Or create a `.env` file:
-```bash
-echo 'ARBITRUM_RPC_URL=https://arbitrum-mainnet.infura.io/v3/YOUR_KEY' > .env
-source .env
-```
-
-### 4. Run Tests
-
-```bash
+# Run PoC
 forge test --fork-url $ARBITRUM_RPC_URL --fork-block-number 426581531 -vvv
 ```
 
-### Expected Output
+Or in one command:
+```bash
+ARBITRUM_RPC_URL=https://arbitrum-mainnet.infura.io/v3/[YOUR_API_KEY] forge test --fork-url $ARBITRUM_RPC_URL --fork-block-number 426581531 -vvv
+```
+
+---
+
+## Expected Output
 
 ```
 Running 6 tests for test/GuaranteedUsdInsolvencyReplication.t.sol:GuaranteedUsdInsolvencyReplication
